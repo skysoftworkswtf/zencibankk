@@ -12,6 +12,8 @@
     "react": "^18",
     "react-dom": "^18",
     "next": "14.2.6"
+    "lucide-react": "0.436.0"
+    "shadcn-ui": "0.8.0"
   },
   "devDependencies": {
     "typescript": "^5",
