@@ -17,7 +17,7 @@ export default function Component() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false)
-    }, 6000) // Increased to 6 seconds
+    }, 6000)
 
     return () => clearTimeout(timer)
   }, [])
@@ -41,7 +41,6 @@ export default function Component() {
       setTimeout(() => {
         setStep('success')
         setTimeout(() => {
-          // Redirect to main page after 3 seconds
           window.location.href = '/'
         }, 3000)
       }, 2000)
@@ -58,29 +57,20 @@ export default function Component() {
       parts.push(match.substring(i, i + 4))
     }
 
-    if (parts.length) {
-      return parts.join(' ')
-    } else {
-      return value
-    }
+    return parts.length ? parts.join(' ') : value
   }
 
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formattedValue = formatCardNumber(e.target.value)
-    setCardNumber(formattedValue)
+    setCardNumber(formatCardNumber(e.target.value))
   }
 
   const formatExpiryDate = (value: string) => {
     const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '')
-    if (v.length >= 2) {
-      return v.slice(0, 2) + '/' + v.slice(2, 4)
-    }
-    return v
+    return v.length >= 2 ? `${v.slice(0, 2)}/${v.slice(2, 4)}` : v
   }
 
   const handleExpiryDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formattedValue = formatExpiryDate(e.target.value)
-    setExpiryDate(formattedValue)
+    setExpiryDate(formatExpiryDate(e.target.value))
   }
 
   if (isLoading) {
@@ -185,23 +175,4 @@ export default function Component() {
           )}
           {step === 'processing' && (
             <div className="flex flex-col items-center justify-center h-full py-8">
-              <Loader2 className="h-24 w-24 text-primary animate-spin mb-6" />
-              <p className="text-2xl font-semibold">Processing Payment...</p>
-            </div>
-          )}
-          {step === 'success' && (
-            <div className="flex flex-col items-center justify-center h-full py-8">
-              <CheckCircle2 className="h-24 w-24 text-green-500 mb-6" />
-              <p className="text-2xl font-semibold mb-2">Payment Successful!</p>
-              <p className="text-muted-foreground">Your invoice will be sent by mail.</p>
-            </div>
-          )}
-        </CardContent>
-        <CardFooter className="justify-between">
-          <p className="text-sm text-muted-foreground">Secure Payment</p>
-          <Lock className="h-4 w-4 text-muted-foreground" />
-        </CardFooter>
-      </Card>
-    </div>
-  )
-}
+             
