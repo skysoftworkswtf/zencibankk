@@ -1,11 +1,8 @@
 "use client";
 
-import { useState, useEffect } from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
+import { Button, Input, Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription, Label } from 'shadcn-ui'
 import { AlertCircle, CheckCircle2, CreditCard, Lock, Loader2 } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
 export default function Component() {
   const [step, setStep] = useState('card-details')
